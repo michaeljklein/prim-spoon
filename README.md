@@ -1,5 +1,7 @@
 #Prim-Spoon
 
+[![Build Status](https://travis-ci.org/michaeljklein/prim-spoon.png)](https://travis-ci.org/michaeljklein/prim-spoon)
+
 This is a microproject for the sole purpose of having a high-performance 
 version of `teaspoon` from [Control.Spoon](http://hackage.haskell.org/package/spoon-0.3.1), using primops.
 While it is unsafe, it is as safe as `catch#` and `seq#` from [GHC.Prim](https://hackage.haskell.org/package/ghc-prim-0.4.0.0/candidate/docs/GHC-Prim.html).
