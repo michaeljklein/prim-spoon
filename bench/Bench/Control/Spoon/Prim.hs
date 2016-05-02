@@ -10,8 +10,10 @@ module Bench.Control.Spoon.Prim (benchControlSpoonPrim) where
 
 import Criterion.Main
 import Control.Spoon      (teaspoon)
-import GHC.Prim           (catch#, realWorld#, seq#)
+import GHC.Prim           (RealWorld, State#, catch#, realWorld#, seq#)
 import Control.Spoon.Prim
+import System.IO.Unsafe   (unsafeDupablePerformIO)
+import System.Mem.StableName
 
 -- | Control mehod for benchmarking (appx. lower bound for a functional solution)
 justToJust :: Maybe a -> Maybe (Maybe a)
@@ -21,6 +23,9 @@ justToJust Nothing    = Nothing
 -- | Control method for benchmarking (appx. lower bound for output of a function)
 catchMethod0 :: a -> Bool
 catchMethod0 = const False
+
+unpackMaybe :: (# State# RealWorld, Maybe a #) -> Maybe a
+unpackMaybe (# _, x #) = x
 
 -- | This, and the following methods, are used for comparison to ensure the
 -- prim-spoon methods are high-performance
@@ -43,6 +48,18 @@ catchMethod4 x = let r = realWorld# in (\(# _, v #) -> v) (catch# ((\f s -> (\(#
 catchMethod5 :: a -> Maybe a
 {-# INLINE catchMethod5 #-}
 catchMethod5 x = (\(# _, v #) -> v) (catch# ((\f s -> (\(# t, y #) -> (# t, Just y #)) (f s)) (seq# x)) (\_ _ -> (# realWorld#, Nothing #)) realWorld#)
+
+-- | This method *only* supports `Prelude.undefined` as the thrown error
+-- (`unsafeDupablePerformIO` doesn't work with parallelism, but neither
+-- does `makeStableName`
+catchMethod6 :: a -> Maybe a
+{-# INLINE catchMethod6 #-}
+catchMethod6 x = if eqStableName undefName . unsafeDupablePerformIO . makeStableName $ x
+                    then Nothing
+                    else Just x
+  where
+    undefName :: forall t. StableName t
+    undefName = unsafeDupablePerformIO . makeStableName $ undefined
 
 -- | Benchmark the different options, with controls for comparison
 benchControlSpoonPrim :: [Benchmark]
@@ -73,6 +90,9 @@ benchControlSpoonPrim = [
                                 ],
   bgroup "catchMethod5        " [ bench "Check undefined" $ whnf catchMethod5 undefined
                                 , bench "Check defined"   $ whnf catchMethod5 False
+                                ],
+  bgroup "catchMethod6        " [ bench "Check undefined" $ whnf catchMethod6 undefined
+                                , bench "Check defined"   $ whnf catchMethod6 False
                                 ],
   bgroup "primspoon           " [ bench "Check undefined" $ whnf primspoon    undefined
                                 , bench "Check defined"   $ whnf primspoon    False
