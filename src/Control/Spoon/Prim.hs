@@ -5,11 +5,24 @@
 {-# LANGUAGE UnboxedTuples #-}
 {-# LANGUAGE Unsafe #-}
 
-module Control.Spoon.Prim where
+{-|
+Module      : Control.Spoon.Prim
+Description : This is the main module for prim-spoon
+Copyright   : (c) Michael Klein, 2016
+License     : GPL-3
+Maintainer  : lambdamichael@gmail.com
+Stability   : experimental
+
+ This module exports `primspoon`. If you want the other
+ spoon functions, you'll need "Control.Spoon".
+-}
+
+module Control.Spoon.Prim (primspoon) where
 
 import GHC.Prim (RealWorld, State#, catch#, realWorld#, seq#)
 import Prelude (Maybe(..))
 
+-- | This function takes an exception and a `State#` `RealWorld`, returning the output of `realWorld#` and `Nothing`
 exceptionToNothing :: a -> State# RealWorld -> (forall b. (# State# RealWorld, Maybe b #))
 {-# INLINE exceptionToNothing #-}
 exceptionToNothing _ _ = (# realWorld#, Nothing #)
