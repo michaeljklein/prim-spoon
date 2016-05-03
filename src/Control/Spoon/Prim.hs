@@ -17,12 +17,12 @@ Stability   : experimental
  spoon functions, you'll need "Control.Spoon".
 -}
 
-module Control.Spoon.Prim (primspoon) where
+module Control.Spoon.Prim (primspoon, throws) where
 
 import GHC.Prim (RealWorld, State#, catch#, realWorld#, seq#)
-import Prelude (Maybe(..))
+import Prelude (Bool(..), Maybe(..))
 
--- | This function takes an exception and a `State#` `RealWorld`, returning the output of `realWorld#` and `Nothing`
+-- | This function takes an exception and a `State#` `RealWorld`, returning the output of `realWorld#` and `Nothing`.
 exceptionToNothing :: a -> State# RealWorld -> (forall b. (# State# RealWorld, Maybe b #))
 {-# INLINE exceptionToNothing #-}
 exceptionToNothing _ _ = (# realWorld#, Nothing #)
@@ -31,3 +31,9 @@ exceptionToNothing _ _ = (# realWorld#, Nothing #)
 primspoon :: a -> Maybe a
 {-# INLINE primspoon #-}
 primspoon x = (\(# _, v #) -> v) (catch# ((\f s -> (\(# t, y #) -> (# t, Just y #)) (f s)) (seq# x)) exceptionToNothing realWorld#)
+
+-- | Check whether a value, when evalueated to weak-head normal form, throws an error/exception. Note that this will evaluate the value to weak-head normal form.
+throws :: a -> Bool
+{-# INLINE throws #-}
+throws x = (\(# _, v #) -> v) (catch# ((\f s -> (\(# t, _ #) -> (# t, False #)) (f s)) (seq# x)) (\_ u -> (# u, True #)) realWorld#)
+
