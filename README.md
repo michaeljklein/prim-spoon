@@ -1,4 +1,4 @@
-#Prim-Spoon
+# Prim-Spoon
 
 [![Build Status](https://travis-ci.org/michaeljklein/prim-spoon.png)](https://travis-ci.org/michaeljklein/prim-spoon)
 
