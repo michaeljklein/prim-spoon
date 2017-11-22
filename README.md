@@ -4,6 +4,8 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ed4eb647c76f41f7bd004572502ebeda)](https://www.codacy.com/app/michaeljklein/prim-spoon?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=michaeljklein/prim-spoon&amp;utm_campaign=Badge_Grade)
 
+[![Hackage](https://img.shields.io/hackage/v/lens.svg)](https://hackage.haskell.org/package/prim-spoon-0.1.0)
+
 
 On hackage as [prim-spoon](https://hackage.haskell.org/package/prim-spoon-0.1.0)
 
